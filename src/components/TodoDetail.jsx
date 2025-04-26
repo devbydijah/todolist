@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Text,
-  Spinner,
-  Heading,
-  Stack,
-  Alert,
-  AlertIcon,
-  IconButton,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import { ArrowBackIcon, CheckIcon, TimeIcon } from "@chakra-ui/icons";
+  AiOutlineArrowLeft,
+  AiOutlineCheck,
+  AiOutlineClockCircle,
+  AiOutlineWarning,
+} from "react-icons/ai";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchTodoById, updateTodo } from "../api/todoApi";
-import { saveTodoToBoth, loadTodosFromBoth } from "../utils/db";
+import { loadTodosFromBoth, saveTodoToBoth } from "../lib/db";
 
 const TodoDetail = () => {
   const { id } = useParams();
@@ -22,127 +15,138 @@ const TodoDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const boxBg = useColorModeValue("gray.50", "gray.50");
-  const textColor = useColorModeValue("black", "black");
-  const buttonBg = useColorModeValue("black", "white");
-  const buttonIconColor = useColorModeValue("white", "black");
-
   useEffect(() => {
-    const loadTodo = async () => {
+    const loadTodo = async (id) => {
       setLoading(true);
       try {
-        const fetchedTodo = await fetchTodoById(id);
-        setTodo(fetchedTodo);
+        const todos = await loadTodosFromBoth();
+        const todo = todos.find((t) => t.id === parseInt(id));
+        if (todo) {
+          setTodo(todo);
+        } else {
+          setError("Todo not found.");
+        }
       } catch (err) {
-        console.error("Failed to fetch todo:", err);
-        setError("Failed to fetch todo");
+        setError("Failed to load todo.");
       } finally {
         setLoading(false);
       }
     };
-    loadTodo();
+    loadTodo(id);
   }, [id]);
 
   const handleToggleCompleted = async () => {
     const updatedTodo = { ...todo, completed: !todo.completed };
-    await updateTodo(id, updatedTodo);
     await saveTodoToBoth(updatedTodo);
     setTodo(updatedTodo);
   };
 
-  useEffect(() => {
-    const loadLocalTodos = async () => {
-      const localTodos = await loadTodosFromBoth();
-      const currentTodo = localTodos.find((todo) => todo.id === parseInt(id));
-      if (currentTodo) {
-        setTodo(currentTodo);
-      }
-    };
-    loadLocalTodos();
-  }, [id]);
-
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
       >
-        <Spinner size="xl" />
-      </Box>
+        <div>Loading...</div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
       >
-        <Alert status="error">
-          <AlertIcon />
+        <div style={{ color: "red" }}>
+          <AiOutlineWarning />
           {error}
-        </Alert>
-      </Box>
+        </div>
+      </div>
     );
   }
 
   if (!todo) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
       >
-        <Text fontSize="xl">Todo not found</Text>
-      </Box>
+        <div style={{ fontSize: "20px" }}>Todo not found</div>
+      </div>
     );
   }
 
   return (
-    <Box>
-      <Box p={6} borderRadius="md" shadow="md" bg={boxBg} mt={4}>
-        <Stack spacing={4} color={textColor}>
-          <Heading as="h2" size="xl">
-            Todo Details
-          </Heading>
-          <Text fontSize="lg">
+    <div>
+      <div
+        style={{
+          padding: "24px",
+          borderRadius: "8px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "#f9f9f9",
+          marginTop: "16px",
+        }}
+      >
+        <div style={{ marginBottom: "16px", color: "#000" }}>
+          <h2 style={{ fontSize: "24px", fontWeight: "bold" }}>Todo Details</h2>
+          <p style={{ fontSize: "18px" }}>
             <strong>Id:</strong> {todo.id}
-          </Text>
-          <Text fontSize="lg">
+          </p>
+          <p style={{ fontSize: "18px" }}>
             <strong>Title:</strong> {todo.title}
-          </Text>
-          <Text fontSize="lg">
+          </p>
+          <p style={{ fontSize: "18px" }}>
             <strong>Completed:</strong> {todo.completed ? "true" : "false"}
-          </Text>
-        </Stack>
-        <IconButton
-          icon={todo.completed ? <CheckIcon /> : <TimeIcon />}
+          </p>
+        </div>
+        <button
           onClick={handleToggleCompleted}
           aria-label={todo.completed ? "Mark as pending" : "Mark as completed"}
-          bg={buttonBg}
-          color={buttonIconColor}
-          _hover={{ bg: buttonBg }}
-          ml={2}
-        />
-      </Box>
+          style={{
+            backgroundColor: todo.completed ? "#000" : "#fff",
+            color: todo.completed ? "#fff" : "#000",
+            border: "none",
+            padding: "8px",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginLeft: "8px",
+          }}
+        >
+          {todo.completed ? <AiOutlineCheck /> : <AiOutlineClockCircle />}
+        </button>
+      </div>
 
-      <Box mt={6} display="flex" alignItems="center">
-        <IconButton
-          icon={<ArrowBackIcon />}
+      <div style={{ marginTop: "24px", display: "flex", alignItems: "center" }}>
+        <button
           onClick={() => navigate(-1)}
           aria-label="Go back"
-          bg={buttonBg}
-          color={buttonIconColor}
-          _hover={{ bg: buttonBg }}
-          mr={2}
-        />
-      </Box>
-    </Box>
+          style={{
+            backgroundColor: "#000",
+            color: "#fff",
+            border: "none",
+            padding: "8px",
+            borderRadius: "4px",
+            cursor: "pointer",
+            marginRight: "8px",
+          }}
+        >
+          <AiOutlineArrowLeft />
+        </button>
+      </div>
+    </div>
   );
 };
 

@@ -1,32 +1,29 @@
 "use client";
 
 import React from "react";
-import { Box, Text, Stack, IconButton, useColorModeValue } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
   const router = useRouter();
-  const buttonBg = useColorModeValue("black", "white");
-  const buttonIconColor = useColorModeValue("white", "black");
 
   return (
-    <Box p={4} textAlign="center" height="100vh" display="flex" alignItems="center" justifyContent="center">
-      <Stack spacing={4} align="center">
-        <Text fontSize="4xl" color="red.500">404 - Page Not Found</Text>
-        <Text fontSize="lg">The page you are looking for does not exist.</Text>
-        <Stack direction="row" spacing={4}>
-          <IconButton
-            icon={<ArrowBackIcon />}
+    <div className="p-4 text-center h-screen flex items-center justify-center">
+      <div className="flex flex-col gap-4 items-center">
+        <h1 className="text-4xl text-red-500">404 - Page Not Found</h1>
+        <p className="text-lg">The page you are looking for does not exist.</p>
+        <div className="flex gap-4">
+          <Button
             onClick={() => router.back()}
             aria-label="Go back"
-            bg={buttonBg}
-            color={buttonIconColor}
-            _hover={{ bg: buttonBg }}
-          />
-        </Stack>
-      </Stack>
-    </Box>
+            className="flex items-center gap-2 bg-black text-white hover:bg-gray-800"
+          >
+            <AiOutlineArrowLeft /> Go Back
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

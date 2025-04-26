@@ -1,6 +1,4 @@
-import React, { Component } from 'react';
-import { Box, Text, Button, Stack } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import React, { Component } from "react";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -19,18 +17,21 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <Box p={4} textAlign="center" height="100vh" display="flex" alignItems="center" justifyContent="center">
-          <Stack spacing={4} align="center">
-            <Text fontSize="4xl" color="red.500">Something went wrong.</Text>
-            <Button as={Link} to="/" colorScheme="teal" size="lg">
+        <div className="p-4 text-center h-screen flex items-center justify-center">
+          <div className="flex flex-col gap-4 items-center">
+            <h1 className="text-4xl text-red-500">Something went wrong.</h1>
+            <button
+              onClick={() => (window.location.href = "/")}
+              className="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600"
+            >
               Go to Home
-            </Button>
-          </Stack>
-        </Box>
+            </button>
+          </div>
+        </div>
       );
     }
 
-    return this.props.children; 
+    return this.props.children;
   }
 }
 

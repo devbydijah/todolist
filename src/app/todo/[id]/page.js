@@ -8,11 +8,15 @@ import {
   Heading,
   Stack,
   Alert,
-  AlertIcon,
   IconButton,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, CheckIcon, TimeIcon } from "@chakra-ui/icons";
+import {
+  ArrowBackIcon,
+  CheckIcon,
+  TimeIcon,
+  WarningIcon,
+} from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import { saveTodoToBoth, loadTodosFromBoth } from "../../../lib/db";
 
@@ -77,7 +81,7 @@ const TodoDetail = ({ params }) => {
         height="100vh"
       >
         <Alert status="error">
-          <AlertIcon />
+          <WarningIcon />
           {error}
         </Alert>
       </Box>

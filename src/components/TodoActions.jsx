@@ -47,7 +47,7 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
         </DialogTrigger>
         <DialogContent className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold dark:text-gray-200">
+            <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold dark:text-gray-200">
               Create New Todo
             </DialogTitle>
             <DialogClose className="absolute top-2 right-2 dark:text-gray-200" />
@@ -153,7 +153,7 @@ export const EditTodo = ({
         </DialogTrigger>
         <DialogContent className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold dark:text-gray-200">
+            <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold dark:text-gray-200">
               Edit Todo
             </DialogTitle>
             <DialogClose className="absolute top-2 right-2 dark:text-gray-200" />

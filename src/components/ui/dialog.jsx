@@ -42,7 +42,7 @@ function DialogContent({ className, children, ...props }) {
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[90%] sm:max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-4 sm:p-6 shadow-lg duration-200",
+          "bg-background fixed top-[50%] left-[50%] z-50 grid w-full max-w-[90%] sm:max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-2 sm:p-4 md:p-6 shadow-lg duration-200",
           className
         )}
         {...props}
@@ -84,7 +84,10 @@ function DialogTitle({ className, ...props }) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-lg leading-none font-semibold", className)}
+      className={cn(
+        "text-lg sm:text-xl md:text-2xl leading-none font-semibold",
+        className
+      )}
       {...props}
     />
   );

@@ -148,3 +148,21 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media (max-width: 640px) {
+  .container {
+    @apply mx-2 p-2;
+  }
+
+  .todo-card {
+    @apply p-2;
+  }
+
+  #todo-form {
+    @apply gap-2;
+  }
+
+  .filter-container {
+    @apply flex-col gap-2;
+  }
+}

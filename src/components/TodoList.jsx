@@ -1,114 +1,146 @@
-import React, { useState, lazy, Suspense, useMemo } from "react";
+"use client";
+
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { Button } from "@/components/ui/button"; // Import Shadcn UI Button
 import {
-  AiOutlineWarning,
-  AiOutlineCheck,
-  AiOutlineClockCircle,
-  AiOutlineArrowLeft,
-  AiOutlineArrowRight,
-} from "react-icons/ai";
-import Link from "next/link";
-import { saveTodoToBoth, deleteTodoFromBoth } from "../lib/db";
-import debounce from "lodash.debounce";
+  HiOutlinePencilAlt,
+  HiOutlineCheck,
+  HiOutlineTrash,
+} from "react-icons/hi"; // Import icons
+import { EditTodo } from "./TodoActions"; // Import EditTodo component
 
-const EditTodo = lazy(() =>
-  import("./TodoActions").then((module) => ({ default: module.EditTodo }))
-);
-const DeleteTodo = lazy(() =>
-  import("./TodoActions").then((module) => ({ default: module.DeleteTodo }))
-);
+const TodoItem = React.memo(({ todo, onToggleComplete, onEdit, onDelete }) => {
+  console.log("TodoItem received onToggleComplete:", onToggleComplete); // Debugging log
 
-const TodoItem = React.memo(
-  ({ todo, handleToggleCompleted, handleTodoUpdated, handleTodoDeleted }) => {
-    return (
-      <div key={todo.id} className="p-4 border rounded-md mb-4">
-        <Link href={`/todo/${todo.id}`}>
-          <p className="text-lg font-bold">{todo.title}</p>
-        </Link>
-        <p className="text-sm text-gray-600">{todo.description}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <button
-            onClick={() => handleToggleCompleted(todo.id, todo.completed)}
-            aria-label={
-              todo.completed ? "Mark as pending" : "Mark as completed"
-            }
-            className="p-2 border rounded-md"
-          >
-            {todo.completed ? (
-              <AiOutlineCheck className="text-green-500" />
-            ) : (
-              <AiOutlineClockCircle className="text-orange-500" />
-            )}
-          </button>
-          <Suspense fallback={<div>Loading...</div>}>
-            <EditTodo
-              id={todo.id}
-              title={todo.title}
-              description={todo.description}
-              onTodoUpdated={handleTodoUpdated}
-            />
-            <DeleteTodo id={todo.id} onTodoDeleted={handleTodoDeleted} />
-          </Suspense>
-        </div>
+  const [isEditOpen, setIsEditOpen] = useState(false); // State to control dialog visibility
+
+  return (
+    <li className="todo-card p-4 border rounded-md shadow-md">
+      <div className="todo-content mb-4">
+        <span
+          className={
+            todo.completed ? "completed font-bold line-through" : "font-bold"
+          }
+        >
+          {todo.title}
+        </span>
+        <p className="todo-description text-sm text-gray-600 mt-2">
+          {todo.description}
+        </p>
       </div>
-    );
-  }
-);
+      <div className="todo-actions flex gap-2">
+        <EditTodo
+          id={todo.id}
+          title={todo.title}
+          description={todo.description}
+          completed={todo.completed}
+          onTodoUpdated={onEdit}
+        >
+          <Button
+            className="ml-2 flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-300"
+            aria-label="Edit todo"
+          >
+            <HiOutlinePencilAlt className="icon mr-2" />
+            <span>Edit</span>
+          </Button>
+        </EditTodo>
+        <Button
+          className="complete-button border bg-green-700 text-white p-2 rounded-md flex items-center gap-2"
+          onClick={() => onToggleComplete(todo.id, todo.completed)}
+          title={todo.completed ? "Mark Incomplete" : "Mark Complete"}
+        >
+          <HiOutlineCheck className="icon mr-2" />
+          <span>{todo.completed ? "Mark Incomplete" : "Mark Complete"}</span>
+        </Button>
+        <Button
+          className="delete-button border bg-red-700 text-white p-2 rounded-md flex items-center gap-2"
+          onClick={() => onDelete(todo.id)}
+          title="Delete Task"
+        >
+          <HiOutlineTrash className="icon mr-2" />
+          <span>Delete</span>
+        </Button>
+      </div>
+    </li>
+  );
+});
 
-const TodoList = ({ todos, loading, error, onDelete, onEdit }) => {
-  const [search, setSearch] = useState("");
+const TodoList = ({ todos, onToggleComplete, onDelete, onEdit }) => {
+  console.log("TodoList received onToggleComplete:", onToggleComplete); // Debugging log
+
+  const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((value) => {
-        setSearch(value);
-      }, 300),
-    []
-  );
+  // Filter and search logic
+  const filteredTodos = todos.filter((todo) => {
+    const matchesSearch = todo.title
+      ?.toLowerCase()
+      .includes(searchTerm.trim().toLowerCase());
 
-  const filteredTodos = useMemo(() => {
-    return todos.filter((todo) => {
-      const matchesSearch = todo.title
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchesFilter =
-        filter === "all" ||
-        (filter === "completed" && todo.completed) ||
-        (filter === "pending" && !todo.completed);
-      return matchesSearch && matchesFilter;
-    });
-  }, [todos, search, filter]);
+    if (filter === "completed") {
+      return todo.completed && matchesSearch;
+    } else if (filter === "incomplete") {
+      return !todo.completed && matchesSearch;
+    }
+
+    return matchesSearch;
+  });
 
   return (
     <div>
-      <div className="flex gap-2 mb-4">
+      <div className="search-container flex items-center gap-4">
         <input
           type="text"
-          placeholder="Search todos..."
-          onChange={(e) => debouncedSearch(e.target.value)}
-          className="p-2 border rounded-md"
+          placeholder="Search tasks..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 rounded-md p-2 w-full"
         />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="p-2 border rounded-md"
+          className="border border-gray-300 rounded-md p-2"
         >
           <option value="all">All</option>
           <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
+          <option value="incomplete">Incomplete</option>
         </select>
       </div>
-      {filteredTodos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          handleToggleCompleted={onEdit}
-          handleTodoUpdated={onEdit}
-          handleTodoDeleted={onDelete}
-        />
-      ))}
+      <ul className="todo-list space-y-4">
+        {filteredTodos.length > 0 ? (
+          filteredTodos.map((todo) => {
+            console.log("Mapping todo, onToggleComplete:", onToggleComplete); // Debugging log
+            return (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggleComplete={onToggleComplete}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            );
+          })
+        ) : (
+          <p>No tasks found.</p>
+        )}
+      </ul>
     </div>
   );
+};
+
+TodoList.propTypes = {
+  todos: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      completed: PropTypes.bool.isRequired,
+    })
+  ).isRequired,
+  onToggleComplete: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
 };
 
 export default TodoList;

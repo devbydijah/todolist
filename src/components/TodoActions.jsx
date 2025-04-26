@@ -37,21 +37,33 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
     <div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button
-            className="mb-4 flex items-center gap-2 bg-black text-white hover:bg-gray-800"
-            aria-label="Add new todo"
+          <button
+            className="bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white p-2 rounded flex items-center gap-2"
+            onClick={() => setIsOpen(true)}
           >
-            <AiOutlinePlus /> Add Todo
-          </Button>
+            <AiOutlinePlus className="icon" />
+            Add Todo
+          </button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <DialogHeader>
-            <h2 className="text-lg font-bold">Create New Todo</h2>
-            <DialogClose className="absolute top-2 right-2" />
+            <DialogTitle className="text-lg font-bold dark:text-gray-200">
+              Create New Todo
+            </DialogTitle>
+            <DialogClose className="absolute top-2 right-2 dark:text-gray-200" />
           </DialogHeader>
+          <DialogDescription
+            id="add-todo-description"
+            className="dark:text-gray-400"
+          >
+            Fill in the details for your new todo item.
+          </DialogDescription>
           <div className="flex flex-col gap-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium dark:text-gray-200"
+              >
                 Title
               </label>
               <Input
@@ -59,13 +71,13 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium"
+                className="block text-sm font-medium dark:text-gray-200"
               >
                 Description
               </label>
@@ -74,22 +86,22 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
           </div>
-          <DialogFooter className="mt-4 flex justify-end gap-2">
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
             <Button
               onClick={handleCreate}
-              className="bg-blue-500 text-white hover:bg-blue-600"
+              className="bg-black border border-black text-white hover:bg-gray-800 dark:bg-white dark:border-white dark:text-black dark:hover:bg-gray-300"
               aria-label="Create todo"
             >
-              <AiOutlineCheck /> Create
+              <AiOutlineCheck className="mr-1" /> Create
             </Button>
             <Button
               variant="ghost"
               onClick={() => setIsOpen(false)}
-              className="hover:bg-gray-100"
+              className="hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Cancel
             </Button>
@@ -104,6 +116,7 @@ export const EditTodo = ({
   id,
   title: initialTitle = "",
   description: initialDescription = "",
+  completed: initialCompleted = false,
   onTodoUpdated = () => {},
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -111,7 +124,16 @@ export const EditTodo = ({
   const [description, setDescription] = useState(initialDescription);
 
   const handleUpdate = async () => {
-    const updatedTodo = { id, title, description, completed: false };
+    if (!title.trim()) {
+      console.error("Title is required.");
+      return;
+    }
+    const updatedTodo = {
+      id,
+      title: title.trim(),
+      description,
+      completed: initialCompleted,
+    };
     console.log("Updated Todo:", updatedTodo); // Debugging log
     await saveTodoToBoth(updatedTodo);
     onTodoUpdated(id, updatedTodo);
@@ -123,21 +145,28 @@ export const EditTodo = ({
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button
-            className="ml-2 flex items-center gap-2 bg-black text-white hover:bg-gray-800"
+            className="ml-2 flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-300"
             aria-label="Edit todo"
           >
-            <AiOutlineEdit /> Edit
+            <AiOutlineEdit className="mr-1" /> Edit
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <DialogHeader>
-            <DialogTitle>Edit Todo</DialogTitle>
-            <DialogClose className="absolute top-2 right-2" />
+            <DialogTitle className="text-lg font-bold dark:text-gray-200">
+              Edit Todo
+            </DialogTitle>
+            <DialogClose className="absolute top-2 right-2 dark:text-gray-200" />
           </DialogHeader>
-          <DialogDescription>Make changes to this todo item.</DialogDescription>
+          <DialogDescription className="dark:text-gray-400">
+            Make changes to this todo item.
+          </DialogDescription>
           <div className="flex flex-col gap-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium dark:text-gray-200"
+              >
                 Title
               </label>
               <Input
@@ -145,13 +174,13 @@ export const EditTodo = ({
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium"
+                className="block text-sm font-medium dark:text-gray-200"
               >
                 Description
               </label>
@@ -160,22 +189,22 @@ export const EditTodo = ({
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
+                className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
           </div>
-          <DialogFooter className="mt-4 flex justify-end gap-2">
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
             <Button
               onClick={handleUpdate}
-              className="bg-blue-500 text-white hover:bg-blue-600"
+              className="bg-black border border-black text-white hover:bg-gray-800 dark:bg-white dark:border-white dark:text-black dark:hover:bg-gray-300"
               aria-label="Update todo"
             >
-              <AiOutlineCheck /> Update
+              <AiOutlineCheck className="mr-1" /> Update
             </Button>
             <Button
               variant="ghost"
               onClick={() => setIsOpen(false)}
-              className="hover:bg-gray-100"
+              className="hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Cancel
             </Button>

@@ -29,8 +29,6 @@ const TodoDetail = ({ params }) => {
 
   const boxBg = useColorModeValue("gray.50", "gray.50");
   const textColor = useColorModeValue("black", "black");
-  const buttonBg = useColorModeValue("black", "white");
-  const buttonIconColor = useColorModeValue("white", "black");
 
   useEffect(() => {
     const loadLocalTodos = async () => {
@@ -122,9 +120,11 @@ const TodoDetail = ({ params }) => {
           icon={todo.completed ? <CheckIcon /> : <TimeIcon />}
           onClick={handleToggleCompleted}
           aria-label={todo.completed ? "Mark as pending" : "Mark as completed"}
-          bg={buttonBg}
-          color={buttonIconColor}
-          _hover={{ bg: buttonBg }}
+          bg="white"
+          color="black"
+          _hover={{ bg: "gray.200" }}
+          _dark={{ bg: "black", color: "black" }}
+          _focus={{ boxShadow: "none" }}
           ml={2}
         />
       </Box>
@@ -134,9 +134,11 @@ const TodoDetail = ({ params }) => {
           icon={<ArrowBackIcon />}
           onClick={() => router.back()}
           aria-label="Go back"
-          bg={buttonBg}
-          color={buttonIconColor}
-          _hover={{ bg: buttonBg }}
+          bg="white"
+          color="black"
+          _hover={{ bg: "gray.200" }}
+          _dark={{ bg: "black", color: "black" }}
+          _focus={{ boxShadow: "none" }}
           mr={2}
         />
       </Box>

@@ -1,22 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Text,
-  Spinner,
-  Heading,
-  Stack,
-  Alert,
-  IconButton,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import {
-  ArrowBackIcon,
-  CheckIcon,
-  TimeIcon,
-  WarningIcon,
-} from "@chakra-ui/icons";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { saveTodoToBoth, loadTodosFromBoth } from "../../../lib/db";
 
@@ -26,9 +11,6 @@ const TodoDetail = ({ params }) => {
   const [todo, setTodo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const boxBg = useColorModeValue("gray.50", "gray.50");
-  const textColor = useColorModeValue("black", "black");
 
   useEffect(() => {
     const loadLocalTodos = async () => {
@@ -59,90 +41,60 @@ const TodoDetail = ({ params }) => {
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Spinner size="xl" />
-      </Box>
+      <div className="flex justify-center items-center h-screen">
+        <div className="spinner" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Alert status="error">
-          <WarningIcon />
-          {error}
-        </Alert>
-      </Box>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500">{error}</div>
+      </div>
     );
   }
 
   if (!todo) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Text fontSize="xl">Todo not found</Text>
-      </Box>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-gray-500">Todo not found</div>
+      </div>
     );
   }
 
   return (
-    <Box>
-      <Box p={6} borderRadius="md" shadow="md" bg={boxBg} mt={4}>
-        <Stack spacing={4} color={textColor}>
-          <Heading as="h2" size="xl">
-            Todo Details
-          </Heading>
-          <Text fontSize="lg">
-            <strong>Id:</strong> {todo.id}
-          </Text>
-          <Text fontSize="lg">
-            <strong>Title:</strong> {todo.title}
-          </Text>
-          <Text fontSize="lg">
-            <strong>Completed:</strong> {todo.completed ? "true" : "false"}
-          </Text>
-        </Stack>
-        <IconButton
-          icon={todo.completed ? <CheckIcon /> : <TimeIcon />}
+    <div className="p-6">
+      <div className="p-6 border rounded-md shadow-md bg-gray-50">
+        <h2 className="text-xl font-bold">Todo Details</h2>
+        <p className="text-lg">
+          <strong>Id:</strong> {todo.id}
+        </p>
+        <p className="text-lg">
+          <strong>Title:</strong> {todo.title}
+        </p>
+        <p className="text-lg">
+          <strong>Completed:</strong> {todo.completed ? "true" : "false"}
+        </p>
+        <Button
           onClick={handleToggleCompleted}
-          aria-label={todo.completed ? "Mark as pending" : "Mark as completed"}
-          bg="white"
-          color="black"
-          _hover={{ bg: "gray.200" }}
-          _dark={{ bg: "black", color: "black" }}
-          _focus={{ boxShadow: "none" }}
-          ml={2}
-        />
-      </Box>
+          className={`mt-4 ${
+            todo.completed ? "bg-green-500" : "bg-yellow-500"
+          } text-white`}
+        >
+          {todo.completed ? "Mark as Pending" : "Mark as Completed"}
+        </Button>
+      </div>
 
-      <Box mt={6} display="flex" alignItems="center">
-        <IconButton
-          icon={<ArrowBackIcon />}
+      <div className="mt-6">
+        <Button
           onClick={() => router.back()}
-          aria-label="Go back"
-          bg="white"
-          color="black"
-          _hover={{ bg: "gray.200" }}
-          _dark={{ bg: "black", color: "black" }}
-          _focus={{ boxShadow: "none" }}
-          mr={2}
-        />
-      </Box>
-    </Box>
+          className="bg-gray-500 text-white"
+        >
+          Go Back
+        </Button>
+      </div>
+    </div>
   );
 };
 

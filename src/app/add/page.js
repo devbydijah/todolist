@@ -1,57 +1,42 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Input, Button, useToast } from "@chakra-ui/react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { saveTodoToBoth } from "../../lib/db";
 
 const page = () => {
   const [title, setTitle] = useState("");
-  const toast = useToast();
   const router = useRouter();
 
   const handleAddTodo = async () => {
     if (!title.trim()) {
-      toast({
-        title: "Title is required.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      alert("Title is required.");
       return;
     }
 
     try {
       await saveTodoToBoth({ title, completed: false });
-      toast({
-        title: "Todo added successfully!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      alert("Todo added successfully!");
       router.push("/");
     } catch (err) {
-      toast({
-        title: "Failed to add todo.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      alert("Failed to add todo.");
     }
   };
 
   return (
-    <Box p={6} maxW="md" mx="auto">
+    <div className="p-6 max-w-md mx-auto">
       <Input
         placeholder="Enter todo title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        mb={4}
+        className="mb-4"
       />
-      <Button colorScheme="blue" onClick={handleAddTodo}>
+      <Button onClick={handleAddTodo} className="bg-blue-500 text-white">
         Add Todo
       </Button>
-    </Box>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-# Next.js To-Do List Application
+# Next.js To-Do List App
 
 This project is a **To-Do List Application** built using **Next.js**, which was migrated from a previous implementation using **React with Vite**. The application is designed to help users manage their tasks effectively by adding, editing, and deleting to-do items. The project is structured with a modular approach, leveraging reusable components and utility functions. The migration to Next.js has enabled server-side rendering, improved performance, and better scalability.
 

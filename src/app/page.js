@@ -14,7 +14,11 @@ import {
   loadTodosFromBoth,
   saveTodoToBoth,
   deleteTodoFromBoth,
+  getPaginatedTodos,
+  getTodos,
 } from "../lib/db";
+
+import { WorkspaceTodos } from "../lib/api"; // Import the function to fetch default todos from the JSON API
 
 const MotionDiv = motion.div;
 
@@ -22,13 +26,34 @@ const Page = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [totalTodos, setTotalTodos] = useState(0);
 
   useEffect(() => {
     const fetchTodos = async () => {
       setLoading(true);
       try {
-        const loadedTodos = await loadTodosFromBoth();
-        setTodos(loadedTodos);
+        const offset = (currentPage - 1) * itemsPerPage;
+        const paginatedTodos = await getPaginatedTodos(itemsPerPage, offset);
+        const allTodos = await getTodos(); // Fetch all todos to calculate total count
+        setTotalTodos(allTodos.length);
+        setTodos(paginatedTodos);
+
+        if (paginatedTodos.length === 0 && currentPage === 1) {
+          // If local database is empty, fetch default todos from the JSON API
+          const defaultTodos = await WorkspaceTodos();
+
+          // Save the fetched todos into the local database
+          for (const todo of defaultTodos) {
+            await saveTodoToBoth(todo);
+          }
+
+          // Reload todos from the local database
+          const reloadedTodos = await getPaginatedTodos(itemsPerPage, offset);
+          setTodos(reloadedTodos);
+          setTotalTodos(defaultTodos.length);
+        }
       } catch (err) {
         setError("Failed to load todos.");
       } finally {
@@ -37,13 +62,14 @@ const Page = () => {
     };
 
     fetchTodos();
-  }, []);
+  }, [currentPage]);
 
   const handleAddTodo = async (title) => {
     try {
       const newTodo = { title, completed: false };
       const savedTodo = await saveTodoToBoth(newTodo);
       setTodos((prevTodos) => [...prevTodos, savedTodo]);
+      setTotalTodos((prevTotal) => prevTotal + 1);
     } catch (err) {
       setError("Failed to add todo.");
     }
@@ -53,31 +79,19 @@ const Page = () => {
     try {
       await deleteTodoFromBoth(id);
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+      setTotalTodos((prevTotal) => prevTotal - 1);
     } catch (err) {
       setError("Failed to delete todo.");
     }
   };
 
   const handleEditTodo = async (id, updates) => {
-    const originalTodo = todos.find((todo) => todo.id === id);
-    if (!originalTodo) {
-      setError("Failed to edit todo: Todo not found.");
-      return;
-    }
-
-    const updatedTodoClient = { ...originalTodo, ...updates };
-    const originalTodos = todos;
-
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) => (todo.id === id ? updatedTodoClient : todo))
+    console.log("Edit Todo Updates:", updates); // Debugging log
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, ...updates } : todo
     );
-
-    try {
-      await saveTodoToBoth(updatedTodoClient);
-    } catch (err) {
-      setError("Failed to update todo.");
-      setTodos(originalTodos);
-    }
+    setTodos(updatedTodos);
+    await saveTodoToBoth(updatedTodos.find((todo) => todo.id === id));
   };
 
   const handleToggleTodo = async (id, currentCompletedStatus) => {
@@ -88,6 +102,8 @@ const Page = () => {
     }
     handleEditTodo(id, { completed: !currentCompletedStatus });
   };
+
+  const totalPages = Math.ceil(totalTodos / itemsPerPage);
 
   if (loading) {
     return (
@@ -121,6 +137,22 @@ const Page = () => {
           onEdit={handleEditTodo}
           onToggle={handleToggleTodo}
         />
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="p-2 border rounded-md"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="p-2 border rounded-md"
+          >
+            Next
+          </button>
+        </div>
       </MotionDiv>
     </ErrorBoundary>
   );

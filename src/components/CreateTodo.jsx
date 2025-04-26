@@ -8,10 +8,11 @@ import {
   DialogHeader,
   DialogFooter,
   DialogClose,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { saveTodoToBoth } from "../lib/db";
 
-const CreateTodo = ({ onTodoCreated }) => {
+const CreateTodo = ({ onAdd }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
 
@@ -19,7 +20,7 @@ const CreateTodo = ({ onTodoCreated }) => {
     try {
       const newTodo = { title, completed: false };
       const createdTodo = await saveTodoToBoth(newTodo);
-      onTodoCreated(createdTodo);
+      onAdd(createdTodo);
       setTitle("");
       setIsOpen(false);
     } catch (err) {
@@ -37,8 +38,8 @@ const CreateTodo = ({ onTodoCreated }) => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <h2 className="text-lg font-bold">Create New Todo</h2>
-            <DialogClose className="absolute top-2 right-2">&times;</DialogClose>
+            <DialogTitle>Create New Todo</DialogTitle>
+            <DialogClose className="absolute top-2 right-2" />
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div>

@@ -13,6 +13,8 @@ import {
   DialogHeader,
   DialogFooter,
   DialogClose,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +47,7 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
         <DialogContent>
           <DialogHeader>
             <h2 className="text-lg font-bold">Create New Todo</h2>
-            <DialogClose className="absolute top-2 right-2">&times;</DialogClose>
+            <DialogClose className="absolute top-2 right-2" />
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div>
@@ -61,7 +63,10 @@ export const AddTodo = ({ onTodoCreated = () => {} }) => {
               />
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium"
+              >
                 Description
               </label>
               <Input
@@ -107,6 +112,7 @@ export const EditTodo = ({
 
   const handleUpdate = async () => {
     const updatedTodo = { id, title, description, completed: false };
+    console.log("Updated Todo:", updatedTodo); // Debugging log
     await saveTodoToBoth(updatedTodo);
     onTodoUpdated(id, updatedTodo);
     setIsOpen(false);
@@ -125,9 +131,10 @@ export const EditTodo = ({
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <h2 className="text-lg font-bold">Edit Todo</h2>
-            <DialogClose className="absolute top-2 right-2">&times;</DialogClose>
+            <DialogTitle>Edit Todo</DialogTitle>
+            <DialogClose className="absolute top-2 right-2" />
           </DialogHeader>
+          <DialogDescription>Make changes to this todo item.</DialogDescription>
           <div className="flex flex-col gap-4">
             <div>
               <label htmlFor="title" className="block text-sm font-medium">
@@ -142,7 +149,10 @@ export const EditTodo = ({
               />
             </div>
             <div>
-              <label htmlFor="description" className="block text-sm font-medium">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium"
+              >
                 Description
               </label>
               <Input

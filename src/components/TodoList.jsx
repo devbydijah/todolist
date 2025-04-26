@@ -10,9 +10,6 @@ import Link from "next/link";
 import { saveTodoToBoth, deleteTodoFromBoth } from "../lib/db";
 import debounce from "lodash.debounce";
 
-const AddTodo = lazy(() =>
-  import("./TodoActions").then((module) => ({ default: module.AddTodo }))
-);
 const EditTodo = lazy(() =>
   import("./TodoActions").then((module) => ({ default: module.EditTodo }))
 );
@@ -27,6 +24,7 @@ const TodoItem = React.memo(
         <Link href={`/todo/${todo.id}`}>
           <p className="text-lg font-bold">{todo.title}</p>
         </Link>
+        <p className="text-sm text-gray-600">{todo.description}</p>
         <div className="flex items-center gap-2 mt-2">
           <button
             onClick={() => handleToggleCompleted(todo.id, todo.completed)}
@@ -56,8 +54,7 @@ const TodoItem = React.memo(
   }
 );
 
-const TodoList = ({ todos, loading, error, deleteTodo, editTodo }) => {
-  const [page, setPage] = useState(1);
+const TodoList = ({ todos, loading, error, onDelete, onEdit }) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
@@ -69,62 +66,31 @@ const TodoList = ({ todos, loading, error, deleteTodo, editTodo }) => {
     []
   );
 
-  const handleSearch = (e) => {
-    debouncedSearch(e.target.value);
-  };
-
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
-
-  const handleTodoUpdated = async (id, updatedTodo) => {
-    await saveTodoToBoth(updatedTodo);
-    editTodo(id, updatedTodo);
-  };
-
-  const handleTodoCreated = (newTodo) => {
-    const updatedTodos = [...todos, newTodo];
-    setTodos(updatedTodos);
-  };
-
-  const handleToggleCompleted = async (id, completed) => {
-    const updatedTodo = todos.find((todo) => todo.id === id);
-    updatedTodo.completed = !completed;
-    await saveTodoToBoth(updatedTodo);
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id ? updatedTodo : todo
-    );
-    setTodos(updatedTodos);
-  };
-
-  const filteredTodos = useMemo(
-    () =>
-      todos.filter((todo) => {
-        const matchesSearch =
-          todo.title && todo.title.toLowerCase().includes(search.toLowerCase());
-        const matchesFilter =
-          filter === "all" ||
-          (filter === "completed" && todo.completed) ||
-          (filter === "pending" && !todo.completed);
-        return matchesSearch && matchesFilter;
-      }),
-    [todos, search, filter]
-  );
+  const filteredTodos = useMemo(() => {
+    return todos.filter((todo) => {
+      const matchesSearch = todo.title
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "completed" && todo.completed) ||
+        (filter === "pending" && !todo.completed);
+      return matchesSearch && matchesFilter;
+    });
+  }, [todos, search, filter]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Todo List</h1>
-      <div className="flex gap-4 mb-4">
+    <div>
+      <div className="flex gap-2 mb-4">
         <input
-          placeholder="Search todos"
-          onChange={handleSearch}
-          aria-label="Search todos"
-          className="p-2 border rounded-md w-full"
+          type="text"
+          placeholder="Search todos..."
+          onChange={(e) => debouncedSearch(e.target.value)}
+          className="p-2 border rounded-md"
         />
         <select
           value={filter}
-          onChange={handleFilterChange}
-          aria-label="Filter todos"
+          onChange={(e) => setFilter(e.target.value)}
           className="p-2 border rounded-md"
         >
           <option value="all">All</option>
@@ -132,52 +98,15 @@ const TodoList = ({ todos, loading, error, deleteTodo, editTodo }) => {
           <option value="pending">Pending</option>
         </select>
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <AddTodo onTodoCreated={handleTodoCreated} />
-      </Suspense>
-      <hr className="my-4" />
-      {loading ? (
-        <div className="flex flex-col gap-4">
-          {[...Array(5)].map((_, index) => (
-            <div key={index} className="h-12 bg-gray-300 rounded-md" />
-          ))}
-        </div>
-      ) : error ? (
-        <div className="text-red-500 flex items-center gap-2">
-          <AiOutlineWarning />
-          {error}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {filteredTodos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              handleToggleCompleted={handleToggleCompleted}
-              handleTodoUpdated={handleTodoUpdated}
-              handleTodoDeleted={deleteTodo}
-            />
-          ))}
-        </div>
-      )}
-      <hr className="my-4" />
-      <div className="flex justify-between">
-        <button
-          onClick={() => setPage(page - 1)}
-          disabled={page === 1}
-          aria-label="Previous page"
-          className="p-2 border rounded-md"
-        >
-          <AiOutlineArrowLeft />
-        </button>
-        <button
-          onClick={() => setPage(page + 1)}
-          aria-label="Next page"
-          className="p-2 border rounded-md"
-        >
-          <AiOutlineArrowRight />
-        </button>
-      </div>
+      {filteredTodos.map((todo) => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          handleToggleCompleted={onEdit}
+          handleTodoUpdated={onEdit}
+          handleTodoDeleted={onDelete}
+        />
+      ))}
     </div>
   );
 };

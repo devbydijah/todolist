@@ -12,6 +12,11 @@ export const getTodos = async () => {
   return await db.todos.toArray();
 };
 
+// Fetch todos with pagination (limit and offset)
+export const getPaginatedTodos = async (limit, offset) => {
+  return await db.todos.offset(offset).limit(limit).toArray();
+};
+
 // Save or update a todo in Dexie
 export const saveTodo = async (todo) => {
   await db.todos.put(todo);
@@ -52,8 +57,13 @@ export const syncTodosFromLocalStorage = async () => {
 
 // Save a todo to both Dexie and localStorage
 export const saveTodoToBoth = async (todo) => {
-  await saveTodo(todo);
-  await syncTodosToLocalStorage();
+  console.log('Saving Todo:', todo); // Debugging log
+  try {
+    await db.todos.put(todo);
+    localStorage.setItem(todo.id, JSON.stringify(todo));
+  } catch (error) {
+    console.error('Error saving todo:', error);
+  }
 };
 
 // Delete a todo from both Dexie and localStorage

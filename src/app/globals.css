@@ -60,7 +60,11 @@ body {
 }
 
 .filter-container {
-  @apply flex gap-4 mb-6;
+  @apply flex gap-4 mb-6 bg-black text-white;
+}
+
+.filter-container .active {
+  @apply text-white bg-transparent;
 }
 
 #tags-filter {
@@ -140,6 +144,38 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.dark .filter-container {
+  @apply bg-black text-white;
+}
+
+.dark .filter-container .active {
+  @apply bg-transparent text-white;
+}
+
+.dark select {
+  @apply bg-gray-900 text-white;
+}
+
+.dark select option {
+  @apply bg-gray-900 text-white;
+}
+
+.dark select option:checked {
+  @apply bg-gray-800 text-white;
+}
+
+select option:checked {
+  @apply bg-gray-200 text-black;
+}
+
+.dark select option:hover {
+  @apply bg-gray-700 text-white;
+}
+
+select option:hover {
+  @apply bg-gray-300 text-black;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -149,7 +185,43 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .container {
+    @apply mx-4 p-4;
+  }
+
+  .todo-card {
+    @apply p-3;
+  }
+
+  #todo-form {
+    @apply gap-3;
+  }
+
+  .filter-container {
+    @apply flex-col gap-3;
+  }
+}
+
 @media (max-width: 640px) {
+  .container {
+    @apply mx-2 p-2;
+  }
+
+  .todo-card {
+    @apply p-2;
+  }
+
+  #todo-form {
+    @apply gap-2;
+  }
+
+  .filter-container {
+    @apply flex-col gap-2;
+  }
+}
+
+@media (max-width: 480px) {
   .container {
     @apply mx-2 p-2;
   }

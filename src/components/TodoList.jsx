@@ -95,7 +95,7 @@ const TodoList = ({ todos, onToggleComplete, onDelete, onEdit }) => {
           placeholder="Search tasks..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 rounded-md p-2 w-full"
+          className="border border-gray-300 rounded-md p-2 w-full"
         />
         <select
           value={filter}

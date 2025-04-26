@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { saveTodoToBoth } from "../../lib/db";
 
-const page = () => {
+const Page = () => {
   const [title, setTitle] = useState("");
   const router = useRouter();
 
@@ -40,4 +40,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

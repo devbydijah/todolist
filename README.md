@@ -149,6 +149,8 @@ src/
 
 The application can be deployed using platforms like **Vercel** for seamless hosting and integration with Next.js. Follow the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
+The live application is available at: [todolist-mauve-nu.vercel.app](https://todolist-mauve-nu.vercel.app/)
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
